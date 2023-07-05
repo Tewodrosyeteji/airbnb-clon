@@ -4,10 +4,12 @@ import { AiOutlineMenu } from "react-icons/ai";
 import Avatar from "../Avatar";
 import { useCallback, useState } from "react";
 import MenuItem from "./MenuItem";
+import useRegisterStore from "@/app/hooks/useRegisterStore";
 type Props = {};
 
 const UserMenu = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const registerStore = useRegisterStore();
 
   const toggleOpen = useCallback(() => {
     setIsOpen((value) => !value);
@@ -32,7 +34,7 @@ const UserMenu = (props: Props) => {
         <div className="absolute text-sm bg-white top-12 right-0 shadow-md  rounded-xl  w-[40vh] overflow-hidden md:w-3/4">
           <div className="flex flex-col cursor-pointer">
             <MenuItem label="login" onClick={() => {}} />
-            <MenuItem label="sign up" onClick={() => {}} />
+            <MenuItem label="sign up" onClick={registerStore.onOpen} />
           </div>
         </div>
       )}

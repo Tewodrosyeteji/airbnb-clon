@@ -1,5 +1,4 @@
-import React from "react";
-
+"use client";
 type MenuItemProps = {
   label: string;
   onClick: () => void;

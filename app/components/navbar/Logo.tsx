@@ -1,4 +1,4 @@
-import { Cinzel_Decorative } from "next/font/google";
+"use client";
 import Image from "next/image";
 
 import React from "react";
