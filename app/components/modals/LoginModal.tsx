@@ -11,9 +11,14 @@ import Heading from "../Heading";
 import Input from "../inputs/Input";
 import { toast } from "react-hot-toast";
 import Button from "../Button";
+import useLoginStore from "@/app/hooks/useLoginStore";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-const RegisterModal = () => {
+const LoginModal = () => {
+  const router = useRouter();
   const registerStore = useRegisterStore();
+  const loginStore = useLoginStore();
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -21,7 +26,6 @@ const RegisterModal = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
@@ -29,24 +33,25 @@ const RegisterModal = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-    axios
-      .post("/api/register", data)
-      .then(() => registerStore.onClose())
-      .catch((error) => toast.error("Something went wrong"))
-      .finally(() => setIsLoading(false));
+    signIn("credentials", {
+      ...data,
+      redirect: false,
+    }).then((callback) => {
+      setIsLoading(false);
+      if (callback?.ok) {
+        toast.success("Logged in");
+        router.refresh();
+        loginStore.onClose();
+      }
+      if (callback?.error) {
+        toast.error(callback.error);
+      }
+    });
   };
 
   const bodyContent = (
     <div className="flex flex-col gap-3">
-      <Heading title="Welcome to Airbnb" subtitle="create an account" />
-      <Input
-        id="name"
-        label="Name"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-      />
+      <Heading title="Welcome back" subtitle="Login into your account" />
       <Input
         id="email"
         label="Email"
@@ -84,12 +89,12 @@ const RegisterModal = () => {
       />
       <div className="text-neutral-500 font-light mt-2 text-center ">
         <div className="flex itmes-center justify-center gap-2">
-          <div>Alread have an account?</div>
+          <div>Don't have an account?</div>
           <div
             onClick={registerStore.onClose}
             className="text-neutral-800 hover:underline cursor-pointer "
           >
-            Log in
+            register
           </div>
         </div>
       </div>
@@ -99,9 +104,9 @@ const RegisterModal = () => {
   return (
     <Modal
       disabled={isLoading}
-      isOpen={registerStore.isOpen}
-      title="register"
-      onClose={registerStore.onClose}
+      isOpen={loginStore.isOpen}
+      title="Login"
+      onClose={loginStore.onClose}
       onSubmit={handleSubmit(onSubmit)}
       actionLabel="submit"
       body={bodyContent}
@@ -110,4 +115,4 @@ const RegisterModal = () => {
   );
 };
 
-export default RegisterModal;
+export default LoginModal;
